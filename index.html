@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Endless Runner — Premium 3D</title>
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/favicon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="description" content="3D endless runner with realistic character — dodge, jump, collect gold.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <div id="ui-container">
+    <div id="start-menu" class="menu-screen active">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="header-container">
+        <div class="badge-tag">PREMIUM 3D EDITION</div>
+        <h1 class="main-title">ENDLESS RUNNER</h1>
+        <div class="sub-title">THE GOLDEN PATH</div>
+      </div>
+      <div class="stats-card">
+        <div class="stat-box">
+          <span class="stat-label">HIGH SCORE</span>
+          <span id="menu-high-score" class="stat-value gold-glow">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-label">TOTAL GOLD</span>
+          <span id="menu-total-coins" class="stat-value coin-text">🪙 0</span>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button id="btn-play" class="btn-primary gold-btn pulse-glow" type="button">
+          <span class="btn-icon">▶</span> RUN NOW
+        </button>
+        <div class="btn-row">
+          <button id="btn-controls" class="btn-secondary" type="button">
+            <span class="btn-icon">🎮</span> CONTROLS
+          </button>
+          <button id="btn-audio-toggle" class="btn-secondary" type="button">
+            <span class="btn-icon">🔊</span> SOUND ON
+          </button>
+        </div>
+      </div>
+      <p class="hint-text">Swipe or on-screen buttons · Keyboard: <kbd>WASD</kbd> / arrows</p>
+    </div>
+
+    <div id="hud" class="hidden">
+      <div class="hud-top">
+        <div class="hud-score">
+          <span class="hud-label">SCORE</span>
+          <span id="hud-score-val" class="hud-value">0</span>
+        </div>
+        <div class="hud-coins">
+          <span class="hud-label">GOLD</span>
+          <span id="hud-coins-val" class="hud-value coin-text">🪙 0</span>
+        </div>
+        <div class="hud-dist">
+          <span class="hud-label">DISTANCE</span>
+          <span id="hud-dist-val" class="hud-value">0m</span>
+        </div>
+        <div class="hud-combo">
+          <span class="hud-label">CHAIN</span>
+          <span id="hud-combo-val" class="hud-value">x1</span>
+        </div>
+        <div id="hud-powerup" class="hud-powerup">
+          <span class="hud-label">POWER-UP</span>
+          <span id="hud-powerup-val" class="hud-value">NONE</span>
+        </div>
+      </div>
+      <div class="hud-actions">
+        <button id="btn-pause-game" class="hud-action" type="button" aria-label="Pause game">⏸</button>
+      </div>
+    </div>
+
+    <div id="touch-pad" class="touch-pad hidden" aria-hidden="true">
+      <div class="touch-col">
+        <button type="button" class="touch-btn" data-action="left" aria-label="Left">◀</button>
+      </div>
+      <div class="touch-col mid">
+        <button type="button" class="touch-btn" data-action="jump" aria-label="Jump">▲</button>
+        <button type="button" class="touch-btn" data-action="slide" aria-label="Slide">▼</button>
+      </div>
+      <div class="touch-col">
+        <button type="button" class="touch-btn" data-action="right" aria-label="Right">▶</button>
+      </div>
+    </div>
+
+    <div id="controls-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button id="btn-close-controls" class="close-btn" type="button" aria-label="Close">✕</button>
+        <h2 class="modal-title">CONTROLS</h2>
+        <ul class="controls-list">
+          <li><kbd>←</kbd> / <kbd>A</kbd> — Move left</li>
+          <li><kbd>→</kbd> / <kbd>D</kbd> — Move right</li>
+          <li><kbd>↑</kbd> / <kbd>W</kbd> / <kbd>Space</kbd> — Jump</li>
+          <li><kbd>↓</kbd> / <kbd>S</kbd> — Slide</li>
+          <li><strong>Shield:</strong> blocks one obstacle hit</li>
+          <li><strong>Magnet:</strong> attracts nearby gold for 8 seconds</li>
+          <li><strong>Mobile:</strong> swipe or on-screen buttons</li>
+        </ul>
+        <button id="btn-controls-ok" class="btn-primary gold-btn" type="button">GOT IT</button>
+      </div>
+    </div>
+
+    <div id="pause-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">PAUSED</h2>
+        <p class="modal-copy">Take a breath and jump back in when you're ready.</p>
+        <div class="action-buttons compact">
+          <button id="btn-resume" class="btn-primary gold-btn" type="button">RESUME</button>
+          <button id="btn-quit-menu" class="btn-secondary" type="button">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="game-over" class="menu-screen hidden">
+      <div class="header-container">
+        <div id="new-record-badge" class="badge-tag record-badge hidden">🏆 NEW HIGH SCORE!</div>
+        <h1 class="main-title danger-text">RUN OVER</h1>
+        <div id="game-over-reason" class="sub-title">You hit an obstacle</div>
+      </div>
+      <div class="game-over-card">
+        <div class="summary-row"><span>Final Score</span><span id="go-score" class="summary-val gold-glow">0</span></div>
+        <div class="summary-row"><span>Gold Collected</span><span id="go-coins" class="summary-val coin-text">🪙 0</span></div>
+        <div class="summary-row"><span>Distance</span><span id="go-distance" class="summary-val">0m</span></div>
+      </div>
+      <div class="action-buttons">
+        <button id="btn-retry" class="btn-primary gold-btn pulse-glow" type="button">
+          <span class="btn-icon">🔄</span> RUN AGAIN
+        </button>
+        <button id="btn-go-menu" class="btn-secondary" type="button">
+          <span class="btn-icon">🏠</span> MAIN MENU
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
